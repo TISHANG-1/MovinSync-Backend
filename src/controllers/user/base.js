@@ -59,10 +59,10 @@ export const verifyUserRequest = async (currentUser, code, type) => {
     verificationExpiryDate = "";
   if (type === "EMAIL") {
     verificationCode = currentUser.verificationCode.email;
-    verificationExpiryDate = currentUser.verificationCode.email;
+    verificationExpiryDate = currentUser.verificationExpiryDate.email;
   } else if (type === "PHONE") {
     verificationCode = currentUser.verificationCode.phoneNumber;
-    verificationExpiryDate = currentUser.verificationCode.phoneNumber;
+    verificationExpiryDate = currentUser.verificationExpiryDate.phoneNumber;
   } else {
     throw generateError(
       RESPONSE_CODES.BAD_REQUEST_CODE,
