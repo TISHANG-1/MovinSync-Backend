@@ -51,6 +51,7 @@ export const authorizedRoles = (role) => {
 // helper functions not for export
 
 const checkAuth = (role, user) => {
+  console.log(user);
   if (role === "traveler") {
     return user.isTraveler;
   }

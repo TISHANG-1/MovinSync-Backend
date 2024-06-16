@@ -83,6 +83,8 @@ export const verifyUserRequest = async (currentUser, code, type) => {
       user.isVerified.phoneNumber = true;
     }
     await user.save();
+  } else {
+    throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "INCORRECT OTP");
   }
 };
 
