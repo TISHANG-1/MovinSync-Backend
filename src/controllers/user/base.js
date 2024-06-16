@@ -27,7 +27,7 @@ export const loginUser = async (loginParams) => {
   const { email = "", phoneNumber = "", password = "" } = loginParams;
   let filter = getFilter(email, phoneNumber);
   const user = await User.findOne(filter).select(
-    "+password name email isTraveler isTravelerCompanion"
+    "+password name email isTraveler phoneNumber isTravelerCompanion"
   );
   if (!user) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "User not found");
@@ -59,10 +59,10 @@ export const verifyUserRequest = async (currentUser, code, type) => {
     verificationExpiryDate = "";
   if (type === "EMAIL") {
     verificationCode = currentUser.verificationCode.email;
-    verificationExpiryDate = currentUser.verificationCode.email;
+    verificationExpiryDate = currentUser.verificationExpiryDate.email;
   } else if (type === "PHONE") {
     verificationCode = currentUser.verificationCode.phoneNumber;
-    verificationExpiryDate = currentUser.verificationCode.phoneNumber;
+    verificationExpiryDate = currentUser.verificationExpiryDate.phoneNumber;
   } else {
     throw generateError(
       RESPONSE_CODES.BAD_REQUEST_CODE,

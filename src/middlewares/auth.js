@@ -7,7 +7,8 @@ export const userAuth = async (req, res, next) => {
     if (!authorization) {
       throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "Malformed Request");
     }
-    const token = authorization;
+    const token = authorization.trim('"');
+    console.log(token);
     if (token === undefined) {
       throw generateError(
         RESPONSE_CODES.BAD_REQUEST_CODE,
