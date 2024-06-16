@@ -27,7 +27,7 @@ export const loginUser = async (loginParams) => {
   const { email = "", phoneNumber = "", password = "" } = loginParams;
   let filter = getFilter(email, phoneNumber);
   const user = await User.findOne(filter).select(
-    "+password name email isTraveler isTravelerCompanion"
+    "+password name email isTraveler phoneNumber isTravelerCompanion"
   );
   if (!user) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "User not found");

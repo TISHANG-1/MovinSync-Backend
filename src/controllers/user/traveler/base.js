@@ -5,7 +5,7 @@ import { sendSMS } from "../../../utils/sendSMS.js";
 import Notification from "../../../models/notification.js";
 import User from "../../../models/User.js";
 import { RESPONSE_CODES, generateError } from "../../../utils/helper.js";
-
+const ROOT_URL = "http://localhost:3000";
 export const createTrip = async (tripParams, currentUser) => {
   const {
     driverName,
@@ -27,6 +27,10 @@ export const createTrip = async (tripParams, currentUser) => {
       lat: startLat,
       lon: startLon,
     },
+    lastUpdatedLocation: {
+      lat: startLat,
+      lon: startLon,
+    },
     destinationLocation: {
       lat: endLat,
       lon: endLon,
@@ -34,7 +38,7 @@ export const createTrip = async (tripParams, currentUser) => {
     status: "ON-GOING",
   });
   await setDataInRedisCache("trip", trip, 10);
-  return;
+  return { tripId: trip._id };
 };
 
 export const updateTrip = async (currentLocation, tripId, currentUser) => {
@@ -53,7 +57,7 @@ export const updateTrip = async (currentLocation, tripId, currentUser) => {
   if (isDestinationNearBy) {
     const options = {
       message: `${currentUser.name} is near ${destinationLocation.lat} and ${destinationLocation.lon}
-       view live status on ${ROOT_URL}/traveler-companion/track-trip/?tripId=${tripId}`,
+       view live status on ${ROOT_URL}/view-trip/${tripId}`,
     };
     const { travelerCompanionIds } = trip;
     for (const travelerCompanionId of travelerCompanionIds) {

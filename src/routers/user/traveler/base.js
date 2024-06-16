@@ -17,8 +17,8 @@ router.post(
   async (req, res) => {
     try {
       const { tripParams } = req.body;
-      await createTrip(tripParams, req.user);
-      res.status(RESPONSE_CODES.CREATED_CODE).send();
+      const trip = await createTrip(tripParams, req.user);
+      res.status(RESPONSE_CODES.CREATED_CODE).send(trip);
     } catch (err) {
       console.log(err);
       const { status = 500, message = "Internal Server Error" } = err;
@@ -68,6 +68,7 @@ router.post(
   async (req, res) => {
     try {
       const { tripId } = req.body;
+      console.log("here");
       await endTrip(tripId, req.user);
       res.status(RESPONSE_CODES.SUCCESS_CODE).send();
     } catch (err) {
