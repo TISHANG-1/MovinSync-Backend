@@ -32,23 +32,34 @@ export const submitFeedback = async (feedbackParams, curretUser) => {
   return;
 };
 
-export const trackOngoinTrip = async (tripId) => {
+export const trackOngoinTrip = async (tripId, currentUser) => {
   const cacheKey = `trip-${tripId}`;
   const cachedTrip = await getDataFromRedisCache(cacheKey);
   if (cachedTrip !== null) {
     await setDataInRedisCache("trip", JSON.parse(cachedTrip), 10);
-    if (cachedTrip.status === "COMPLETED") {
+
+    const tripInfo = JSON.parse(cachedTrip);
+    const authorized = tripInfo.travelerCompanionIds.includes(currentUser._id);
+    if (!authorized) {
+      return { tripInfo: { status: "Not Authorized" } };
+    }
+    if (tripInfo.status === "COMPLETED") {
       return { tripInfo: { status: "COMPLETED" } };
     }
-    return { tripInfo: JSON.parse(cachedTrip) };
+    return { tripInfo };
   }
   const trip = await Trip.findById(tripId);
   if (!trip) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "Trip doesnt exists");
   }
   setDataInRedisCache("trip", trip, 10);
+  const tripInfo = trip;
+  const authorized = tripInfo.travelerCompanionIds.includes(currentUser._id);
+  if (!authorized) {
+    return { tripInfo: { status: "NOT Authorized" } };
+  }
   if (trip.status === "COMPLETED") {
     return { tripInfo: { status: "COMPLETED" } };
   }
-  return { tripInfo: trip };
+  return { tripInfo };
 };

@@ -32,7 +32,7 @@ router.get(
   async (req, res) => {
     try {
       const { tripId } = req.query;
-      const tripInfo = await trackOngoinTrip(tripId);
+      const tripInfo = await trackOngoinTrip(tripId, req.user);
       res.status(RESPONSE_CODES.SUCCESS_CODE).send(tripInfo);
     } catch (err) {
       console.log(err);
