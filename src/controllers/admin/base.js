@@ -7,38 +7,43 @@ export const fetchAllSharedTrip = async () => {
     travelerCompanionIds: { $exists: true, $ne: [] },
   });
 
-  let userIdToName = {};
+  let userIdToNameMap = {};
+  let userIdToEmailMap = {};
   let sharedRides = [];
-
+  let index = 0;
   for (const trip of sharedTrips) {
     const {
       travelerId,
       travelerCompanionIds,
       startLocation,
       destinationLocation,
-      lastUpdatedLocation,
+      lastTrackedLocation,
     } = trip;
 
-    if (!userIdToName[travelerId]) {
+    if (!userIdToNameMap[travelerId]) {
       const user = await User.findById(travelerId);
-      userIdToName[travelerId] = user.name;
+      userIdToNameMap[travelerId] = user.name;
+      userIdToEmailMap[travelerId] = user.email;
     }
 
     let travelerCompanions = [];
     for (const travelerCompanionId of travelerCompanionIds) {
-      if (!userIdToName[travelerCompanionId]) {
+      if (!userIdToNameMap[travelerCompanionId]) {
         const user = await User.findById(travelerCompanionId);
-        userIdToName[travelerCompanionId] = user.name;
+        userIdToNameMap[travelerCompanionId] = user.name;
+        userIdToEmailMap[travelerCompanionId] = user.email;
       }
-      travelerCompanions.push(userIdToName[travelerCompanionId]);
+      travelerCompanions.push(userIdToEmailMap[travelerCompanionId]);
     }
 
     sharedRides.push({
-      travelerName: userIdToName[travelerId],
+      index: ++index,
+      name: userIdToNameMap[travelerId],
+      email: userIdToEmailMap[travelerId],
       travelerCompanions,
       startLocation,
       destinationLocation,
-      lastUpdatedLocation,
+      lastTrackedLocation,
     });
   }
 
@@ -48,16 +53,16 @@ export const fetchAllSharedTrip = async () => {
 export const fetchAllFeedbacks = async () => {
   const feedbacks = await Feedback.find({});
 
-  let userIdToName = {};
+  let userIdToEmailMap = {};
   let tripIdToTripDetails = {};
   let allFeedbacks = [];
-
+  let index = 0;
   for (const feedback of feedbacks) {
     const { userId, rating, description, tripId } = feedback;
 
-    if (!userIdToName[userId]) {
+    if (!userIdToEmailMap[userId]) {
       const user = await User.findById(userId);
-      userIdToName[userId] = user.name;
+      userIdToEmailMap[userId] = user.email;
     }
 
     if (!tripIdToTripDetails[tripId]) {
@@ -67,13 +72,15 @@ export const fetchAllFeedbacks = async () => {
         destinationLocation: trip.destinationLocation,
       };
     }
-
     allFeedbacks.push({
-      userName: userIdToName[userId],
+      index: index + 1,
+      email: userIdToEmailMap[userId],
       rating,
       description,
-      tripDetails: tripIdToTripDetails[tripId],
+      ...tripIdToTripDetails[tripId],
+      tripId,
     });
+    index += 1;
   }
 
   return { allFeedbacks };

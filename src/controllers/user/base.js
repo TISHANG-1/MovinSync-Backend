@@ -18,16 +18,25 @@ export const createUser = async (userParams) => {
       "User cannot be created"
     );
   }
-  const { name, email, phoneNumber, isTraveler, isTravelerCompanion } = user;
+  const { name, email, phoneNumber, isTraveler, isTravelerCompanion, isAdmin } =
+    user;
   const token = await user.getJWTToken();
-  return { name, email, phoneNumber, token, isTraveler, isTravelerCompanion };
+  return {
+    name,
+    email,
+    phoneNumber,
+    token,
+    isTraveler,
+    isTravelerCompanion,
+    isAdmin,
+  };
 };
 
 export const loginUser = async (loginParams) => {
   const { email = "", phoneNumber = "", password = "" } = loginParams;
   let filter = getFilter(email, phoneNumber);
   const user = await User.findOne(filter).select(
-    "+password name email isTraveler phoneNumber isTravelerCompanion"
+    "+password name email isTraveler phoneNumber isTravelerCompanion isAdmin"
   );
   if (!user) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "User not found");

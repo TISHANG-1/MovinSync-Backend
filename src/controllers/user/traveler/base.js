@@ -42,7 +42,7 @@ export const createTrip = async (tripParams, currentUser) => {
 };
 
 export const updateTrip = async (currentLocation, tripId, currentUser) => {
-  const trip = await Trip.findById(tripId);
+  const trip = await Trip.findOne({ _id: tripId, travelerId: currentUser._id });
   if (!trip) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "Trip not found");
   }
@@ -78,7 +78,7 @@ export const updateTrip = async (currentLocation, tripId, currentUser) => {
 };
 
 export const shareTrip = async (travelerCompanionList, tripId, currentUser) => {
-  const trip = await Trip.findById(tripId);
+  const trip = await Trip.findOne({ _id: tripId, travelerId: currentUser._id });
   if (!trip) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "Trip not found");
   }
@@ -107,7 +107,7 @@ export const shareTrip = async (travelerCompanionList, tripId, currentUser) => {
 };
 
 export const endTrip = async (tripId, currentUser) => {
-  const trip = await Trip.findById(tripId);
+  const trip = await Trip.findOne({ _id: tripId, travelerId: currentUser._id });
   if (!trip) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "Trip not found");
   }
@@ -140,17 +140,29 @@ export const getSharedTripsDetails = async (currentUser) => {
     travelerId: currentUser._id,
     travelerCompanionIds: { $exists: true, $ne: [] },
   });
-  const sharedTripList = [];
+  let sharedTripList = [];
   let index = 0;
   for (const trip of trips) {
+    let travelerCompanionIdToEmailMap = {};
+    let travelerCompanions = [];
+    const { travelerCompanionIds } = trip;
+    for (const travelerCompanionId of travelerCompanionIds) {
+      if (!travelerCompanionIdToEmailMap[travelerCompanionId]) {
+        const user = await User.findById(travelerCompanionId);
+        travelerCompanionIdToEmailMap[travelerCompanionId] = user.email;
+      }
+      travelerCompanions.push(
+        travelerCompanionIdToEmailMap[travelerCompanionId]
+      );
+    }
     sharedTripList.push({
       key: trip._id,
       index: index + 1,
       driverName: trip.driverDetails.name,
-      vechileNumber: trip.driverDetails.vechileNumber,
+      vechileNumber: trip.vehicleId,
       startLocation: trip.startLocation,
       destinationLocation: trip.destinationLocation,
-      travelerCompanions: trip.travelerCompanionIds,
+      travelerCompanions: travelerCompanions,
       status: trip.status,
     });
   }
