@@ -88,7 +88,7 @@ export const shareTrip = async (travelerCompanionList, tripId, currentUser) => {
     const user = await User.findOne(filter);
     const options = {
       message: `${currentUser.name} is near ${destinationLocation.lat} and ${destinationLocation.lon}
-        view live status on ${ROOT_URL}/traveler-companion/track-trip/?tripId=${tripId}
+        view live status on ${ROOT_URL}/view-trip/${tripId}
       `,
     };
     if (user) {
@@ -116,7 +116,7 @@ export const endTrip = async (tripId, currentUser) => {
   const { lastTrackedLocation } = trip;
   const options = {
     message: `${currentUser.name} has ended trip nearby ${lastTrackedLocation.lat} and ${lastTrackedLocation.lon}
-     view live status on ${ROOT_URL}/traveler-companion/track-trip/?tripId=${tripId}
+     view live status on ${ROOT_URL}/view-trip/${tripId}
     `,
   };
   const { travelerCompanionIds } = trip;
