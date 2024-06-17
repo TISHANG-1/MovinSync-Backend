@@ -40,7 +40,7 @@ export const trackOngoinTrip = async (tripId) => {
     if (cachedTrip.status === "COMPLETED") {
       return { tripInfo: { status: "COMPLETED" } };
     }
-    return { tripInfo: cachedTrip };
+    return { tripInfo: JSON.parse(cachedTrip) };
   }
   const trip = await Trip.findById(tripId);
   if (!trip) {

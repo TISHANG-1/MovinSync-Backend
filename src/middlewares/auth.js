@@ -7,8 +7,7 @@ export const userAuth = async (req, res, next) => {
     if (!authorization) {
       throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "Malformed Request");
     }
-    const token = authorization.trim('"');
-    console.log(token);
+    const token = authorization;
     if (token === undefined) {
       throw generateError(
         RESPONSE_CODES.BAD_REQUEST_CODE,
@@ -51,7 +50,6 @@ export const authorizedRoles = (role) => {
 // helper functions not for export
 
 const checkAuth = (role, user) => {
-  console.log(user);
   if (role === "traveler") {
     return user.isTraveler;
   }
