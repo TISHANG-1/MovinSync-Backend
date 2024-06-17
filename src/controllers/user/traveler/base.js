@@ -82,6 +82,10 @@ export const shareTrip = async (travelerCompanionList, tripId, currentUser) => {
   if (!trip) {
     throw generateError(RESPONSE_CODES.BAD_REQUEST_CODE, "Trip not found");
   }
+  let companionAlreadyExistsMap = {};
+  for (const companion of trip.travelerCompanionIds) {
+    companionAlreadyExistsMap[companion] = true;
+  }
   for (const travelerCompanion of travelerCompanionList) {
     const filter = getFilter(travelerCompanion);
     const { destinationLocation } = trip;
@@ -92,7 +96,9 @@ export const shareTrip = async (travelerCompanionList, tripId, currentUser) => {
       `,
     };
     if (user) {
-      trip.travelerCompanionIds.push(user._id);
+      if (!companionAlreadyExistsMap[user._id])
+        trip.travelerCompanionIds.push(user._id);
+      companionAlreadyExistsMap[user._id] = true;
       await trip.save();
       sendSMS({ ...options, phoneNumber: user.phoneNumber });
       await Notification.create({
